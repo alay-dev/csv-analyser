@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/main";
-import { AltArrowRight, Chart2, HashtagSquare, Widget } from "solar-icon-set";
+import { AltArrowRight, Chart2, HashtagSquare, MagicStick3, Widget } from "solar-icon-set";
 
 const Sidebar = () => {
   const { panel, setPanel } = useAppStore();

@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactFlow, useNodesState, useEdgesState, Edge, Background, BackgroundVariant, SelectionMode } from "@xyflow/react";
+import { ReactFlow, useNodesState, useEdgesState, Edge, Background, BackgroundVariant, SelectionMode, PanOnScrollMode } from "@xyflow/react";
 import StackNode from "../_components/group";
 import { Group } from "@/types/common";
 import useInitCanvas from "@/hooks/use-init-canvas";
@@ -35,7 +35,8 @@ const Canvas = () => {
       selectionOnDrag
       panOnDrag={[1, 2]}
       selectionMode={SelectionMode.Full}
-      // panOnScrollMode="vertical"
+      minZoom={0.4}
+      maxZoom={3}
     >
       <Background variant={BackgroundVariant.Lines} />
     </ReactFlow>

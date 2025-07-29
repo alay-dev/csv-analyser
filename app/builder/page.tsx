@@ -7,6 +7,7 @@ import { ReactFlowProvider } from "@xyflow/react";
 import Canvas from "./_views/canvas";
 import { MetricPanel } from "./_panels/metric";
 import { WidgetPanel } from "./_panels/widgets";
+import Agent from "./_panels/agent";
 
 const Builder = () => {
   const panel = useAppStore((state) => state.panel);
@@ -26,12 +27,17 @@ const Builder = () => {
                     return <MetricPanel />;
                   case "widget":
                     return <WidgetPanel />;
+                  // case "agent":
+                  //   return <Agent />;
                   default:
                     return null;
                 }
               })()}
             </div>
           ) : null}
+          <div className="absolute bottom-0 right-0 h-full w-[30rem]">
+            <Agent />
+          </div>
         </div>
       </ReactFlowProvider>
     </Main>
