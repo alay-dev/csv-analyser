@@ -1,9 +1,19 @@
+import { useAppStore } from "@/store/main";
 import Sidebar from "./sidebar";
 import Topbar from "./topbar";
+
+import { useDataStore } from "@/store/data";
+import { CSVUploadModal } from "../builder/_modal/upload-csv";
+import { env } from "process";
+import { InitDashboardModal } from "../builder/_modal/init-dashboard";
 
 const layoutStyles = { height: "calc(100% - 3rem)", top: "3rem", left: 0 };
 
 const Main = ({ children }: { children: React.ReactElement }) => {
+  const fileName = useDataStore((state) => state.fileData?.fileName);
+  const sessionId = useDataStore((state) => state.sessionId);
+  const isInitialized = useAppStore((state) => state.isInitialized);
+
   return (
     <main className="h-screen bg-foreground">
       <Topbar />
@@ -11,6 +21,14 @@ const Main = ({ children }: { children: React.ReactElement }) => {
         <Sidebar />
         {children}
       </div>
+
+      <CSVUploadModal
+        open={!fileName}
+        onOpenChange={() => {}} // Empty function makes it non-closeable
+        closeable={false}
+      />
+
+      <InitDashboardModal open={!isInitialized && !!sessionId} onOpenChange={() => {}} />
     </main>
   );
 };

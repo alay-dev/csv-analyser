@@ -1,1 +1,1 @@
-import { GroupElement } from "@/types/common";
+import { Element } from "@/types/common";

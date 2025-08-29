@@ -6,6 +6,7 @@ interface AppState {
   isAuthenticated: boolean;
   user: null | string;
   panel: null | string;
+  isAiAgent: boolean;
   isTestPanel: boolean;
   activeElement: null | string;
   isPanDisabled: boolean;
@@ -16,6 +17,7 @@ interface AppState {
   setActiveElement: (val: null | string) => void;
   setDisablePan: (val: boolean) => void;
   setTestPanel: (val: boolean) => void;
+  setAiAgent: (val: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -27,6 +29,8 @@ export const useAppStore = create<AppState>()(
     activeElement: null,
     isPanDisabled: false,
     isTestPanel: false,
+    isAiAgent: true,
+    setAiAgent: (val) => set({ isAiAgent: val }),
     setInitialized: (val) => set({ isInitialized: val }),
     setAuthenticated: (val) => set({ isAuthenticated: val }),
     setUser: (val) => set({ user: val }),

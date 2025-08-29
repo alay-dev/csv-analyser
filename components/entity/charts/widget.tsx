@@ -1,11 +1,11 @@
 import { DataTable } from "../widgets/table";
 import Text from "../widgets/text";
 
-const Widget = ({ type, id, selected }: { type: string; id: string; selected: boolean }) => {
+const Widget = ({ type, selected }: { type: string; selected: boolean }) => {
   switch (type) {
-    case "text":
-      return <Text elementID={id} selected={selected} />;
-    case "table":
+    case "TEXT":
+      return <Text selected={selected} />;
+    case "TABLE":
       return <DataTable selected={selected} />;
   }
 };

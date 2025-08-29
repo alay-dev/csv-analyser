@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { useGroupStore } from "@/store/group";
 import { useAppStore } from "@/store/main";
 
-import { Entity, GroupElement } from "@/types/common";
+import { Entity, Element, EntityType } from "@/types/common";
 import { nanoid } from "nanoid";
 import { DragEvent } from "react";
 import { CloseCircle } from "solar-icon-set";
@@ -13,9 +13,9 @@ export const ChartPanel = () => {
   const setPanel = useAppStore((state) => state.setPanel);
   const { setDragGroupElement, dragGroupElement } = useGroupStore((state) => state);
 
-  const onDragStart = (event: DragEvent<HTMLElement>, type: Entity, subType: string) => {
-    const groupElement: GroupElement = { id: nanoid(), isInitialized: false, type, subType };
-    setDragGroupElement(groupElement);
+  const onDragStart = (event: DragEvent<HTMLElement>, type: EntityType, subType: string) => {
+    const element: Element = { id: nanoid(), isInitialized: false, type, subType };
+    setDragGroupElement(element);
     event.dataTransfer.effectAllowed = "move";
     const dragImage = event.currentTarget.cloneNode(true) as HTMLElement;
     dragImage.style.position = "absolute";

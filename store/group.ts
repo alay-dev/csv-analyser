@@ -1,13 +1,13 @@
-import { GroupElement } from "@/types/common";
+import { Element } from "@/types/common";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 interface GroupState {
   draggedOverGroup?: string;
-  dragGroupElement?: GroupElement;
+  dragGroupElement?: Element;
   totalGroup: number;
   setDraggedOverGroup: (val?: string) => void;
-  setDragGroupElement: (val?: GroupElement) => void;
+  setDragGroupElement: (val?: Element) => void;
   increaseGroupCount: () => void;
   dereaseGroupCount: () => void;
 }

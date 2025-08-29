@@ -4,10 +4,16 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { useAppStore } from "@/store/main";
-import { CloseCircle, SendSquare } from "solar-icon-set";
-import { cn } from "@/lib/utils";
+import { AltArrowDown, CloseCircle, SendSquare } from "solar-icon-set";
+import { cn, getNextPosition } from "@/lib/utils";
+import type { Chart, Entity, NodeAttribute } from "@/types/common";
+import { createChartNode } from "@/lib/group";
+import { nanoid } from "nanoid";
+import { useDataStore } from "@/store/data";
+import { useReactFlow } from "@xyflow/react";
+import ReactMarkdown from "react-markdown";
+import useLoadDemo from "@/hooks/use-load-demo";
 
 interface Message {
   id: string;
@@ -17,13 +23,18 @@ interface Message {
 }
 
 const Agent = () => {
+  const { addNodeData, nodeData } = useDataStore();
+  const { addNodes } = useReactFlow();
   const setPanel = useAppStore((state) => state.setPanel);
+  const setAiAgent = useAppStore((state) => state.setAiAgent);
+  const { callAiAgent } = useLoadDemo();
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       content: "Hello! I'm your AI assistant. I can help you analyze your CSV data, create charts, and answer questions about your dashboard. How can I assist you today?",
       sender: "ai",
-      timestamp: new Date(),
+      timestamp: new Date("2023-08-17T14:30:00Z"),
     },
   ]);
   const [inputValue, setInputValue] = useState("");
@@ -44,39 +55,39 @@ const Agent = () => {
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: inputValue.trim(),
-      sender: "user",
-      timestamp: new Date(),
-    };
+    const userMessage: Message = { id: nanoid(), content: inputValue.trim(), sender: "user", timestamp: new Date() };
 
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsLoading(true);
+    const { response, type } = await callAiAgent(userMessage.content);
 
-    // Simulate AI response (replace with actual AI integration)
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        content: generateAIResponse(userMessage.content),
-        sender: "ai",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, aiResponse]);
+    try {
+      if (type === "CHART") {
+        const parsedData = JSON.parse(response);
+        const charts = parsedData.charts as Chart[];
+        // const existingNodes: Position[] = nodeData.map((item) => ({ x: item.x, y: item.position.y, height: item.height || 0, width: item.width || 0 }));
+        const existingNodes: NodeAttribute[] = nodeData.map((item) => item.data.attributes!);
+        for (const c of charts) {
+          const id = nanoid();
+          const position = getNextPosition(existingNodes, { boxHeight: c.height, boxWidth: c.width, canvasWidth: 2400 });
+          const element: Entity = { id, position, type: "GROUP", data: { element: createChartNode(c.chart_type, id), name: `Group` } };
+
+          addNodeData({ id, data: { type: "CHART", chart: c, attributes: { ...position, width: c.width, height: c.height } } });
+          addNodes([element]);
+          existingNodes.push({ ...position, height: c.height, width: c.width });
+        }
+        const aiResponse: Message = { id: nanoid(), content: "Generated charts based on the provided data.", sender: "ai", timestamp: new Date() };
+        setMessages((prev) => [...prev, aiResponse]);
+      } else {
+        const aiResponse: Message = { id: nanoid(), content: response, sender: "ai", timestamp: new Date() };
+        setMessages((prev) => [...prev, aiResponse]);
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
       setIsLoading(false);
-    }, 1000 + Math.random() * 2000);
-  };
-
-  const generateAIResponse = (userInput: string): string => {
-    const responses = [
-      "I can help you analyze that data. Could you provide more details about what specific insights you're looking for?",
-      "Based on your CSV data, I can suggest creating visualizations that would best represent your information. What type of chart would you prefer?",
-      "That's an interesting question! Let me analyze your data patterns and provide you with some insights.",
-      "I can help you create metrics and dashboards. What key performance indicators are most important for your analysis?",
-      "Great question! I can assist with data filtering, sorting, and creating custom views. What would you like to focus on?",
-    ];
-    return responses[Math.floor(Math.random() * responses.length)];
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -86,16 +97,11 @@ const Agent = () => {
     }
   };
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
   return (
     <div className="bg-background h-full shadow-xl relative border-r flex flex-col">
-      {/* Header */}
       <div className="p-5 pb-3 border-b">
-        <div onClick={() => setPanel(null)} className="absolute z-10 top-2 right-2 hover:bg-gray-100 transition duration-200 w-8 h-8 flex items-center justify-center rounded-md text-gray-500 cursor-pointer">
-          <CloseCircle size={20} className="m-0 p-0 flex" />
+        <div onClick={() => setAiAgent(false)} className="absolute z-10 top-2 right-2 hover:bg-gray-100 transition duration-200 w-8 h-8 flex items-center justify-center rounded-md text-gray-500 cursor-pointer">
+          <AltArrowDown size={20} className="m-0 p-0 flex" />
         </div>
         <div className="w-full relative">
           <h4 className="text-lg font-semibold text-black">AI Assistant</h4>
@@ -103,20 +109,19 @@ const Agent = () => {
         </div>
       </div>
 
-      {/* Messages Area */}
       <div className="flex-1 overflow-hidden">
         <ScrollArea ref={scrollAreaRef} className="h-full px-5 py-4">
           <div className="space-y-4">
             {messages.map((message) => (
-              <div key={message.id} className={cn("flex w-full", message.sender === "user" ? "justify-end" : "justify-start")}>
-                <div className={cn("max-w-[80%] rounded-2xl px-4 py-3 text-sm", message.sender === "user" ? "bg-blue-500 text-white rounded-br-md" : "bg-gray-100 text-gray-900 rounded-bl-md")}>
-                  <p className="whitespace-pre-wrap">{message.content}</p>
-                  <p className={cn("text-xs mt-2 opacity-70", message.sender === "user" ? "text-blue-100" : "text-gray-500")}>{formatTime(message.timestamp)}</p>
+              <div key={message.id} className={cn("flex w-full ", message.sender === "user" ? "justify-end" : "justify-start")}>
+                <div className={cn("max-w-[80%] rounded-2xl px-4 py-3 text-sm prose", message.sender === "user" ? "bg-blue-500 text-white rounded-br-md" : "bg-gray-100 text-gray-900 rounded-bl-md")}>
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
+
+                  {/* <p className={cn("text-xs mt-2 opacity-70", message.sender === "user" ? "text-blue-100" : "text-gray-500")}>{formatTime(message.timestamp)}</p> */}
                 </div>
               </div>
             ))}
 
-            {/* Loading indicator */}
             {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-3 text-sm">
@@ -132,7 +137,6 @@ const Agent = () => {
         </ScrollArea>
       </div>
 
-      {/* Input Area */}
       <div className="p-5 pt-3 border-t bg-white">
         <div className="flex space-x-2">
           <Input ref={inputRef} value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyPress={handleKeyPress} placeholder="Type your message..." disabled={isLoading} className="flex-1" />

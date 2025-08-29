@@ -2,11 +2,10 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useGroupStore } from "@/store/group";
 import { useAppStore } from "@/store/main";
-import { GroupElement } from "@/types/common";
+import { Element } from "@/types/common";
 import { nanoid } from "nanoid";
 import { DragEvent, useMemo } from "react";
 import { CloseCircle } from "solar-icon-set";
-import { METRICS } from "@/constants/charts";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDataStore } from "@/store/data";
 import { HashtagSquare } from "solar-icon-set";
@@ -14,12 +13,10 @@ import { HashtagSquare } from "solar-icon-set";
 export const MetricPanel = () => {
   const setPanel = useAppStore((state) => state.setPanel);
   const { setDragGroupElement, dragGroupElement } = useGroupStore((state) => state);
-  const { data } = useDataStore();
-
-  console.log(data, "DATA !!");
+  // const { data } = useDataStore();
 
   const onDragStart = (event: DragEvent<HTMLElement>, key: string) => {
-    const groupElement: GroupElement = {
+    const groupElement: Element = {
       id: nanoid(),
       isInitialized: false,
       type: "METRIC",
@@ -40,11 +37,11 @@ export const MetricPanel = () => {
     setDragGroupElement(undefined);
   };
 
-  const metrics = useMemo(() => {
-    if (!data?.length) return [];
+  // const metrics = useMemo(() => {
+  //   if (!data?.length) return [];
 
-    return Object.keys(data[0]);
-  }, [data]);
+  //   return Object.keys(data[0]);
+  // }, [data]);
 
   return (
     <div className="bg-background h-full shadow-xl py-5 relative border-r">
@@ -56,7 +53,7 @@ export const MetricPanel = () => {
       </div>
       <Separator className="my-2 " />
       <ScrollArea className="px-5 mt-5 ">
-        <div className="grid grid-cols-1 gap-3 max-h-[83vh] ">
+        {/* <div className="grid grid-cols-1 gap-3 max-h-[83vh] ">
           {metrics.map((item) => {
             return (
               <div
@@ -71,7 +68,7 @@ export const MetricPanel = () => {
               </div>
             );
           })}
-        </div>
+        </div> */}
       </ScrollArea>
     </div>
   );

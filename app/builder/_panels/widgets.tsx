@@ -2,7 +2,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useGroupStore } from "@/store/group";
 import { useAppStore } from "@/store/main";
-import { GroupElement } from "@/types/common";
+import { Element } from "@/types/common";
 import { nanoid } from "nanoid";
 import { DragEvent } from "react";
 import { CloseCircle } from "solar-icon-set";
@@ -13,12 +13,12 @@ export const WidgetPanel = () => {
   const { setDragGroupElement, dragGroupElement } = useGroupStore((state) => state);
 
   const onDragStart = (event: DragEvent<HTMLElement>, subType: string) => {
-    const groupElement: GroupElement = {
+    const groupElement: Element = {
       id: nanoid(),
       isInitialized: false,
       type: "WIDGET",
       subType,
-      text: subType === "text" ? { value: "Some text", bold: true, italic: false, underline: false } : undefined,
+      text: subType === "text" ? "Some text" : undefined,
     };
     setDragGroupElement(groupElement);
     event.dataTransfer.effectAllowed = "move";

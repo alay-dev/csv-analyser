@@ -5,22 +5,21 @@ import { chartConfig, ChartConfig, ChartContainer, ChartTooltip, ChartTooltipCon
 import { useDataStore } from "@/store/data";
 import { useMemo } from "react";
 import { format } from "date-fns";
+import { useNodeId } from "@xyflow/react";
 
 const AreaChart = () => {
-  const { data } = useDataStore();
+  const id = useNodeId()!;
+  const { getNodeData } = useDataStore();
 
   const chartData = useMemo(() => {
-    return data.map((item) => ({
-      date: format(new Date(item.Date), "dd"),
-      value: +item.Spend,
-    }));
-  }, [data]);
+    return getNodeData(id)?.data.chart?.data!;
+  }, []);
 
   return (
-    <ChartContainer config={chartConfig} className="min-h-[10rem] m-0 borders">
+    <ChartContainer config={chartConfig} className=" m-0 borders">
       <Chart accessibilityLayer data={chartData}>
         <CartesianGrid vertical={false} />
-        <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, 3)} />
+        <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
         <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
         <Area dataKey="value" type="natural" fill="var(--color-mobile)" fillOpacity={0.4} stroke="var(--color-mobile)" stackId="a" />
         {/* <Area dataKey="desktop" type="natural" fill="var(--color-desktop)" fillOpacity={0.4} stroke="var(--color-desktop)" stackId="a" /> */}

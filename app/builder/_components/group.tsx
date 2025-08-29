@@ -1,27 +1,39 @@
 import Chart from "@/components/entity/chart";
 import Widget from "@/components/entity/charts/widget";
-import Metric from "@/components/entity/metric";
 import { Button } from "@/components/ui/button";
-import { campaignMetricsTitleMap } from "@/constants/charts";
 import { cn } from "@/lib/utils";
+import { useDataStore } from "@/store/data";
 import { useGroupStore } from "@/store/group";
-import { Group } from "@/types/common";
-import { Edge, NodeProps, NodeResizer, NodeToolbar, Position, useReactFlow } from "@xyflow/react";
-import { memo, useCallback } from "react";
+import { Entity } from "@/types/common";
+import { Edge, NodeProps, NodeResizer, NodeToolbar, OnResize, Position, ResizeDragEvent, useNodeId, useReactFlow } from "@xyflow/react";
+import { memo, useCallback, useEffect } from "react";
 import { Copy, TrashBin2 } from "solar-icon-set";
 
-const StackNode = memo(({ data, selected, ...props }: NodeProps<Group>) => {
-  const { deleteElements } = useReactFlow<Group, Edge>();
+const StackNode = memo(({ data, selected, ...props }: NodeProps<Entity>) => {
+  const id = useNodeId()!;
+  const { deleteElements } = useReactFlow<Entity, Edge>();
   const { dereaseGroupCount } = useGroupStore((state) => state);
-  const stack = data.group;
+  const { deleteNode, getNodeData, nodeData, updateNodeData } = useDataStore();
+  const node = getNodeData(id);
+
+  useEffect(() => {
+    if (!props.height || !props.width) return; // this is to prevent the error when the node is first created
+    updateNodeData(id, { ...node.data, data: { ...node.data, attributes: { ...node.data.attributes, width: props.width, height: props.height } } });
+    // updateNodeAttribute(stack[0].id, { width: props.width, height: props.height });
+  }, [props.height, props.width]);
 
   const onDelete = useCallback(() => {
-    deleteElements({ nodes: [{ id: props.id }] });
+    deleteElements({ nodes: [{ id }] });
     dereaseGroupCount();
-  }, [deleteElements, dereaseGroupCount, props.id]);
+    deleteNode(id);
+  }, [deleteElements, dereaseGroupCount]);
+
+  if (!node) return null;
+
+  const nodeAttribute = node.data.attributes;
 
   return (
-    <div id={props.id} className={cn("bg-white rounded-lg border border-blue-100 transition duration-300  overflow-hidden", selected && "border border-blue-700")}>
+    <div id={props.id} className={cn("bg-white rounded-lg border border-blue-100 transition duration-300  overflow-hidden", selected && "border border-blue-700")} style={{ width: nodeAttribute.width, height: nodeAttribute.height }}>
       <NodeResizer minWidth={100} minHeight={30} lineClassName="opacity-0 " handleClassName="opacity-0" />
       <NodeToolbar position={Position.Top}>
         <div className="flex items-center border border-blue-300 rounded-lg bg-white overflow-hidden ">
@@ -35,18 +47,18 @@ const StackNode = memo(({ data, selected, ...props }: NodeProps<Group>) => {
       </NodeToolbar>
 
       <div className="p-5">
-        {stack.map((item) => {
-          switch (item.type) {
+        {(() => {
+          switch (node.data.type) {
             case "CHART":
-              return <Chart key={item.id} type={item.subType} />;
-            case "METRIC":
-              return <Metric key={item.id} label={item.subType} selected={selected} />;
+              return <Chart type={node.data.chart?.chart_type!} />;
+            // case "METRIC":
+            //   return <Metric label={node.subType} selected={selected} />;
             case "WIDGET":
-              return <Widget key={item.id} type={item.subType} id={item.id} selected={selected} />;
+              return <Widget type={"TEXT"} selected={selected} />;
             default:
               return null;
           }
-        })}
+        })()}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
-import { Entity } from "@/types/common";
+import { Entity, EntityType } from "@/types/common";
 import { Chart as BarChart, DiagramUp as AreaChart, RoundGraph, HashtagSquare } from "solar-icon-set";
 
-export type Item = { icon: any; label: string; type: Entity; subType: string; img?: string };
+export type Item = { icon: any; label: string; type: EntityType; subType: string; img?: string };
 
 export const CHARTS: Item[] = [
   { label: "Area chart", icon: AreaChart, type: "CHART", subType: "AREA", img: "/images/charts/line.svg" },

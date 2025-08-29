@@ -1,14 +1,15 @@
 "use client";
 
 import { useGroupStore } from "@/store/group";
-import { GroupElement } from "@/types/common";
+import { Element, Entity } from "@/types/common";
 import { useReactFlow } from "@xyflow/react";
-import { nanoid } from "nanoid";
 import { DragEvent, useCallback } from "react";
 import "@xyflow/react/dist/style.css";
+import { useDataStore } from "@/store/data";
 
 const useInitCanvas = () => {
   const { screenToFlowPosition, addNodes } = useReactFlow();
+  const { addNodeData } = useDataStore();
   const { dragGroupElement, increaseGroupCount, totalGroup } = useGroupStore((state) => state);
 
   const onDrop = useCallback(
@@ -18,8 +19,12 @@ const useInitCanvas = () => {
       if (!dragGroupElement) return;
       const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
 
-      const element: GroupElement = Object.assign(dragGroupElement, { isInitialized: true });
-      const group = { id: nanoid(), type: "GROUP", position, data: { group: [element], name: `Group ${totalGroup + 1}` } };
+      const element: Element = Object.assign(dragGroupElement, { isInitialized: true });
+      const group: Entity = { id: dragGroupElement.id, type: "GROUP", position, data: { element, name: `Group ${totalGroup + 1}` } };
+
+      if (element.type === "WIDGET") {
+        addNodeData({ id: dragGroupElement.id, data: { type: "WIDGET", text: dragGroupElement.text, attributes: { ...position, width: 200, height: 50 } } });
+      }
 
       addNodes([group]);
       increaseGroupCount();
