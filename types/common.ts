@@ -43,6 +43,14 @@ export type NodeAttribute = {
   height: number;
 };
 
+export interface Message {
+  id: string;
+  content: string;
+  role: "user" | "assistant";
+  // timestamp: Date;
+  additional_kwargs: { message_type: "DASHBOARD" | "CHART" | "TEXT" };
+}
+
 export type SummaryMetric = {
   items: {
     entity_type: "TEXT" | "CHART";
@@ -54,6 +62,11 @@ export type SummaryMetric = {
     chart: Chart;
     table: null;
   }[];
+};
+
+export type MessageHistoryRes = {
+  session_id: string;
+  messages: Message[];
 };
 
 export type AiAgentRes = {

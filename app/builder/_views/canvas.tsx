@@ -2,15 +2,16 @@
 
 import { ReactFlow, useNodesState, useEdgesState, Edge, Background, BackgroundVariant, SelectionMode, PanOnScrollMode, useReactFlow } from "@xyflow/react";
 import StackNode from "../_components/group";
-import { Entity, SummaryMetric } from "@/types/common";
+import { Entity } from "@/types/common";
 import useInitCanvas from "@/hooks/use-init-canvas";
-import { useDataStore } from "@/store/data";
-import useLoadDemo from "@/hooks/use-load-demo";
+import { Tag, useDataStore } from "@/store/data";
+import useCallAgent from "@/hooks/use-call-agent";
 import { useCallback, useEffect } from "react";
 import { nanoid } from "nanoid";
+import { pGenericGenerateDashboard } from "@/constants/prompts";
+import useInitReport from "@/hooks/use-init-report";
 import { createChartNode, createTextNode } from "@/lib/group";
 import { useAppStore } from "@/store/main";
-import { InitDashboardModal } from "../_modal/init-dashboard";
 
 const nodeTypes = {
   GROUP: StackNode,
@@ -21,50 +22,36 @@ const defaultViewport = { x: 0, y: 0, zoom: 1.5 };
 const Canvas = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState<Entity>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-  const { onDrop, onDragOver } = useInitCanvas();
-  const { setFileName, addNodeData, nodeData, sessionId } = useDataStore();
-  const { setInitialized, isInitialized } = useAppStore();
   const { addNodes } = useReactFlow();
-
-  const sessionID = useDataStore((state) => state.sessionId);
-  const { callAiAgent } = useLoadDemo();
-
-  const init = useCallback(async () => {
-    setInitialized(false);
-    const res = await callAiAgent("Generate a overview or a dashboard for the data in the form of charts in a dashboard format");
-    const parsedData = JSON.parse(res.response) as SummaryMetric;
-    const nodes = [];
-    for (const item of parsedData.items) {
-      const id = nanoid();
-
-      const position = { x: item.x, y: item.y };
-
-      switch (item.entity_type) {
-        case "TEXT":
-          const textElement: Entity = { id, position, type: "GROUP", data: { element: createTextNode(id, item.text), name: `Group` } };
-          addNodeData({ id, data: { type: "WIDGET", text: item.text, attributes: { ...position, width: item.width + 40, height: item.height } } });
-          addNodes([textElement]);
-          break;
-        case "CHART":
-          const element: Entity = { id, position, type: "GROUP", data: { element: createChartNode(item.chart.chart_type, id), name: `Group` } };
-          addNodeData({ id, data: { type: "CHART", chart: item.chart, attributes: { ...position, width: item.width, height: item.height } } });
-          addNodes([element]);
-
-          break;
-      }
-
-      nodes.push({ ...position, height: 250, width: 400 });
-    }
-    setInitialized(true);
-  }, [addNodeData, addNodes, callAiAgent, setInitialized]);
+  const { onDrop, onDragOver } = useInitCanvas();
+  const { tags, addTags, setCurrentTag, currentTag, nodeData } = useDataStore();
+  const { setInitialized, isInitialized } = useAppStore();
 
   useEffect(() => {
-    if (!sessionID) {
-      return;
-    }
+    console.log("USE EFFECT CALLED");
+    if (!currentTag?.sessionID) return;
+    if (!nodeData.length) return;
+    if (isInitialized) return;
 
-    init();
-  }, [callAiAgent, init, sessionID]);
+    for (const node of nodeData) {
+      const element: Entity[] = [];
+      const id = node.id;
+      const position = { x: node.data.attributes.x, y: node.data.attributes.y };
+      switch (node.data.type) {
+        case "CHART":
+          element.push({ id, position, type: "GROUP", data: { element: createChartNode(node.data.chart?.chart_type || "BAR", id), name: `Group` } });
+          break;
+        case "WIDGET":
+          element.push({ id, position, type: "GROUP", data: { element: createTextNode(id, node.data.text || "Sample Heading"), name: `Group` } });
+          break;
+        default:
+          continue;
+      }
+
+      addNodes(element);
+      setInitialized(true);
+    }
+  }, [addNodes, currentTag?.sessionID, isInitialized, nodeData, setInitialized]);
 
   return (
     <ReactFlow

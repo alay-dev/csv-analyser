@@ -3,8 +3,11 @@
 import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useDataStore } from "@/store/data";
+import { Tag, useDataStore } from "@/store/data";
 import { Upload, FileText, X, Database } from "lucide-react";
+import { nanoid } from "nanoid";
+import { pGenericGenerateDashboard } from "@/constants/prompts";
+import useInitReport from "@/hooks/use-init-report";
 interface CSVUploadModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -21,7 +24,8 @@ export const CSVUploadModal = ({ open, onOpenChange, closeable = true }: CSVUplo
   const [isUploading, setIsUploading] = useState<"custom" | "sample" | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { setFileData, setSessionId } = useDataStore();
+  const { setFileData, addTags, setCurrentTag, currentTag, tags } = useDataStore();
+  const [initReport] = useInitReport();
 
   // Sample CSV URL - replace with your actual sample CSV URL
   const SAMPLE_CSV_URL = "https://jigdqwfhhikqsochomtq.supabase.co/storage/v1/object/public/csv/user_uploads/1754643085786_Netflix.csv";
@@ -64,7 +68,13 @@ export const CSVUploadModal = ({ open, onOpenChange, closeable = true }: CSVUplo
 
       const parsedCreateRes = (await createRes.json()) as CreateSessionResponse;
 
-      setSessionId(parsedCreateRes.session_id);
+      if (!currentTag) {
+        const tag: Tag = { name: "overview", id: nanoid(), sessionID: parsedCreateRes.session_id, prompt: pGenericGenerateDashboard };
+        addTags([tag]);
+        initReport(tag, parsedCreateRes.session_id);
+      } else {
+        // create new report for the sname csv
+      }
     } catch (error) {
       console.error("Error uploading file:", error);
       alert(`Error uploading file: ${error instanceof Error ? error.message : "Please try again."}`);
@@ -122,7 +132,13 @@ export const CSVUploadModal = ({ open, onOpenChange, closeable = true }: CSVUplo
       });
 
       const parsedCreateRes = (await createRes.json()) as CreateSessionResponse;
-      setSessionId(parsedCreateRes.session_id);
+      if (!currentTag) {
+        const tag: Tag = { name: "overview", id: nanoid(), sessionID: parsedCreateRes.session_id, prompt: pGenericGenerateDashboard };
+        addTags([tag]);
+        initReport(tag, parsedCreateRes.session_id);
+      } else {
+        // create new report for the sname csv
+      }
     } catch (error) {
       console.error("Error loading sample CSV:", error);
       alert(`Error loading sample CSV: ${error instanceof Error ? error.message : "Please try again."}`);
@@ -133,7 +149,7 @@ export const CSVUploadModal = ({ open, onOpenChange, closeable = true }: CSVUplo
 
   return (
     <Dialog open={open} onOpenChange={closeable ? onOpenChange : () => {}}>
-      <DialogContent className="p-8 ">
+      <DialogContent className="p-10 ">
         <DialogHeader className="hidden">
           <DialogTitle>Upload CSV</DialogTitle>
         </DialogHeader>

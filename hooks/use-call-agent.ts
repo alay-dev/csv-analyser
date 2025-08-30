@@ -1,28 +1,19 @@
-import { demoData, demoFileName, demoNodes } from "@/constants/demo";
-import { createChartNode, createTextNode } from "@/lib/group";
 import { useDataStore } from "@/store/data";
-import { AiAgentRes, Entity, SummaryMetric } from "@/types/common";
-import { useReactFlow } from "@xyflow/react";
-import { nanoid } from "nanoid";
-import { useCallback, useEffect } from "react";
+import { AiAgentRes } from "@/types/common";
+import { useCallback } from "react";
 
-const useLoadDemo = () => {
-  const { setFileName, addNodeData, nodeData, sessionId } = useDataStore();
-
-  const callAiAgent = useCallback(
-    async (query: string) => {
-      return fetch("http://127.0.0.1:8000/query", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ query, session_id: sessionId }),
-      }).then(async (res) => {
-        return (await res.json()) as AiAgentRes;
-      });
-    },
-    [sessionId]
-  );
+const useCallAgent = () => {
+  const callAiAgent = useCallback(async (query: string, sessionID: string) => {
+    return fetch("http://127.0.0.1:8000/query", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ query, session_id: sessionID }),
+    }).then(async (res) => {
+      return (await res.json()) as AiAgentRes;
+    });
+  }, []);
 
   // useEffect(() => {
   //   if (!isCanvasInitialized) return;
@@ -63,4 +54,4 @@ const useLoadDemo = () => {
   return { callAiAgent };
 };
 
-export default useLoadDemo;
+export default useCallAgent;

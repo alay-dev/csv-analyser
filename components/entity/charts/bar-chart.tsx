@@ -8,15 +8,20 @@ import { useNodeId } from "@xyflow/react";
 
 const BarChart = () => {
   const id = useNodeId()!;
-  const { getNodeData } = useDataStore();
+  const { getNodeData, nodeData } = useDataStore();
+  console.log(nodeData, id, "NODE DATA");
+
+  const node = getNodeData(id)?.data;
 
   const chartData = useMemo(() => {
-    return getNodeData(id)?.data.chart?.data || [];
-  }, []);
+    return node?.chart?.data || [];
+  }, [node?.chart?.data]);
 
-  const xAxis = getNodeData(id)?.data.chart?.x_axis[0]!;
-  const yAxis = getNodeData(id)?.data.chart?.y_axis[0]!;
-  const title = getNodeData(id)?.data?.chart?.chart_name!;
+  console.log(chartData, "CHART DATA");
+
+  const xAxis = node?.chart?.x_axis[0] || "sample X axis";
+  const yAxis = node?.chart?.y_axis[0] || "sample Y axis";
+  const title = node?.chart?.chart_name || "Sample Chart Name";
 
   return (
     <div>

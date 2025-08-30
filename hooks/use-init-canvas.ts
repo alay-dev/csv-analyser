@@ -9,7 +9,7 @@ import { useDataStore } from "@/store/data";
 
 const useInitCanvas = () => {
   const { screenToFlowPosition, addNodes } = useReactFlow();
-  const { addNodeData } = useDataStore();
+  const { addNodeData, currentTag } = useDataStore();
   const { dragGroupElement, increaseGroupCount, totalGroup } = useGroupStore((state) => state);
 
   const onDrop = useCallback(
@@ -23,13 +23,13 @@ const useInitCanvas = () => {
       const group: Entity = { id: dragGroupElement.id, type: "GROUP", position, data: { element, name: `Group ${totalGroup + 1}` } };
 
       if (element.type === "WIDGET") {
-        addNodeData({ id: dragGroupElement.id, data: { type: "WIDGET", text: dragGroupElement.text, attributes: { ...position, width: 200, height: 50 } } });
+        addNodeData({ id: dragGroupElement.id, tag: currentTag!, data: { type: "WIDGET", text: dragGroupElement.text, attributes: { ...position, width: 200, height: 50 } } });
       }
 
       addNodes([group]);
       increaseGroupCount();
     },
-    [dragGroupElement, increaseGroupCount, screenToFlowPosition, addNodes, totalGroup]
+    [dragGroupElement, screenToFlowPosition, totalGroup, addNodes, increaseGroupCount, addNodeData, currentTag]
   );
 
   const onDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {

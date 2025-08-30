@@ -11,8 +11,8 @@ const layoutStyles = { height: "calc(100% - 3rem)", top: "3rem", left: 0 };
 
 const Main = ({ children }: { children: React.ReactElement }) => {
   const fileName = useDataStore((state) => state.fileData?.fileName);
-  const sessionId = useDataStore((state) => state.sessionId);
   const isInitialized = useAppStore((state) => state.isInitialized);
+  const currentTag = useDataStore((state) => state.currentTag);
 
   return (
     <main className="h-screen bg-foreground">
@@ -28,7 +28,7 @@ const Main = ({ children }: { children: React.ReactElement }) => {
         closeable={false}
       />
 
-      <InitDashboardModal open={!isInitialized && !!sessionId} onOpenChange={() => {}} />
+      <InitDashboardModal open={!isInitialized && !!currentTag?.sessionID} onOpenChange={() => {}} />
     </main>
   );
 };

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDataStore } from "@/store/data";
-import useLoadDemo from "@/hooks/use-load-demo";
+import useCallAgent from "@/hooks/use-call-agent";
 import { Brain, FileText, Download, Sparkles, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
@@ -63,11 +63,11 @@ export const AIReportGeneratorModal = ({ open, onOpenChange }: AIReportGenerator
   const [generatedReport, setGeneratedReport] = useState<string>("");
   const [showReport, setShowReport] = useState(false);
 
-  const { fileName, sessionId } = useDataStore();
-  const { callAiAgent } = useLoadDemo();
+  const { fileName, currentTag } = useDataStore();
+  const { callAiAgent } = useCallAgent();
 
   const handleGenerateReport = async () => {
-    if (!sessionId) {
+    if (!currentTag?.sessionID) {
       alert("Please upload a CSV file first to generate a report.");
       return;
     }
@@ -118,7 +118,7 @@ export const AIReportGeneratorModal = ({ open, onOpenChange }: AIReportGenerator
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col" isCloseable={false}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5" />
@@ -168,7 +168,7 @@ export const AIReportGeneratorModal = ({ open, onOpenChange }: AIReportGenerator
                 <Button variant="outline" onClick={() => onOpenChange(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleGenerateReport} disabled={isGenerating || !sessionId || (selectedReportType === "custom" && !customPrompt.trim())} className="min-w-[120px]">
+                <Button onClick={handleGenerateReport} disabled={isGenerating || !currentTag?.sessionID || (selectedReportType === "custom" && !customPrompt.trim())} className="min-w-[120px]">
                   {isGenerating ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
