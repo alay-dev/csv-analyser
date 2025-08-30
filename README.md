@@ -1,36 +1,21 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📊 CSV to Report Generator – Data Visualization SaaS  
 
-## Getting Started
+A React-based SaaS application that transforms CSV files into **beautiful dashboards and reports** with charts, tables, and insights.  
+This project helps users quickly **analyze, visualize, and share data** without needing advanced technical skills.  
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Demo  
+🎥 Check out the demo here:  
+[CSV to Report Generator – Demo](https://drive.google.com/file/d/1mAUGAWUWDesWJLcLZN8rdC4c7SXmDjju/view?usp=sharing)  
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ✨ Features  
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- 📂 **CSV Upload** – Import CSV files easily.  
+- 📊 **Automated Charts & Tables** – Generates meaningful visualizations instantly.  
+- 📝 **Smart Summaries** – Converts raw data into understandable insights.  
+- 🎨 **Customizable Dashboards** – Arrange charts, tables, and headers dynamically.  
+- ⚡ **Fast & Responsive** – Built with React, Tailwind CSS, and modern best practices.  
+- ☁️ **SaaS Ready** – Designed to scale as a reporting platform.  
