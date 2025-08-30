@@ -7,7 +7,7 @@ This project helps users quickly **analyze, visualize, and share data** without 
 
 ## 🚀 Demo  
 🎥 Check out the demo here:  
-[CSV to Report Generator – Demo](./public/videos/reportify-480.mov)  
+[CSV to Report Generator – Demo](https://jigdqwfhhikqsochomtq.supabase.co/storage/v1/object/public/csv/demo/reportify-480.mov)  
 
 ---
 
